@@ -1,1120 +1,548 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CampaignOS — 行銷活動管理系統</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-<style>
-  :root {
-    --bg: #0d0d0f;
-    --bg2: #141416;
-    --bg3: #1c1c20;
-    --bg4: #242428;
-    --border: rgba(255,255,255,0.07);
-    --border2: rgba(255,255,255,0.12);
-    --text: #f0ede8;
-    --text2: #9c9890;
-    --text3: #5c5a56;
-    --accent: #c8f135;
-    --accent2: #a8d020;
-    --accent-dim: rgba(200,241,53,0.12);
-    --accent-dim2: rgba(200,241,53,0.06);
-    --green: #34d399;
-    --green-dim: rgba(52,211,153,0.12);
-    --amber: #fbbf24;
-    --amber-dim: rgba(251,191,36,0.12);
-    --red: #f87171;
-    --red-dim: rgba(248,113,113,0.12);
-    --blue: #60a5fa;
-    --blue-dim: rgba(96,165,250,0.12);
-    --radius: 10px;
-    --radius-lg: 14px;
-  }
-
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-
-  body {
-    font-family: 'DM Sans', sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    min-height: 100vh;
-    display: flex;
-    overflow-x: hidden;
-  }
-
-  /* SIDEBAR */
-  .sidebar {
-    width: 220px;
-    min-height: 100vh;
-    background: var(--bg2);
-    border-right: 1px solid var(--border);
-    display: flex;
-    flex-direction: column;
-    position: fixed;
-    top: 0; left: 0;
-    z-index: 100;
-  }
-
-  .logo {
-    padding: 24px 20px 20px;
-    border-bottom: 1px solid var(--border);
-  }
-
-  .logo-mark {
-    display: flex; align-items: center; gap: 8px;
-  }
-
-  .logo-icon {
-    width: 28px; height: 28px;
-    background: var(--accent);
-    border-radius: 6px;
-    display: flex; align-items: center; justify-content: center;
-  }
-
-  .logo-icon svg { width: 16px; height: 16px; }
-
-  .logo-text {
-    font-family: 'DM Serif Display', serif;
-    font-size: 16px;
-    color: var(--text);
-    letter-spacing: -0.02em;
-  }
-
-  .logo-sub {
-    font-size: 10px;
-    color: var(--text3);
-    margin-top: 4px;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-  }
-
-  .nav {
-    padding: 16px 12px;
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-  }
-
-  .nav-section-label {
-    font-size: 10px;
-    color: var(--text3);
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    padding: 8px 8px 4px;
-    margin-top: 8px;
-  }
-
-  .nav-item {
-    display: flex; align-items: center; gap: 10px;
-    padding: 8px 10px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 13.5px;
-    font-weight: 400;
-    color: var(--text2);
-    transition: all 0.15s;
-    text-decoration: none;
-    position: relative;
-  }
-
-  .nav-item:hover { background: var(--bg3); color: var(--text); }
-
-  .nav-item.active {
-    background: var(--accent-dim);
-    color: var(--accent);
-    font-weight: 500;
-  }
-
-  .nav-item .nav-icon {
-    width: 16px; height: 16px;
-    opacity: 0.7;
-    flex-shrink: 0;
-  }
-
-  .nav-item.active .nav-icon { opacity: 1; }
-
-  .nav-badge {
-    margin-left: auto;
-    background: var(--bg4);
-    color: var(--text2);
-    font-size: 10px;
-    font-weight: 500;
-    padding: 2px 6px;
-    border-radius: 99px;
-  }
-
-  .nav-item.active .nav-badge {
-    background: var(--accent-dim);
-    color: var(--accent);
-  }
-
-  .sidebar-footer {
-    padding: 16px 12px;
-    border-top: 1px solid var(--border);
-  }
-
-  .user-card {
-    display: flex; align-items: center; gap: 10px;
-    padding: 8px 10px;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: background 0.15s;
-  }
-
-  .user-card:hover { background: var(--bg3); }
-
-  .avatar {
-    width: 28px; height: 28px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, #c8f135, #60a5fa);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 11px;
-    font-weight: 500;
-    color: #000;
-    flex-shrink: 0;
-  }
-
-  .user-info { flex: 1; min-width: 0; }
-  .user-name { font-size: 12.5px; font-weight: 500; color: var(--text); }
-  .user-role { font-size: 11px; color: var(--text3); }
-
-  /* MAIN */
-  .main {
-    margin-left: 220px;
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-  }
-
-  /* TOP BAR */
-  .topbar {
-    height: 60px;
-    border-bottom: 1px solid var(--border);
-    display: flex; align-items: center;
-    padding: 0 28px;
-    gap: 16px;
-    background: var(--bg);
-    position: sticky; top: 0; z-index: 50;
-  }
-
-  .topbar-title {
-    font-family: 'DM Serif Display', serif;
-    font-size: 20px;
-    letter-spacing: -0.02em;
-    color: var(--text);
-  }
-
-  .topbar-right { margin-left: auto; display: flex; align-items: center; gap: 10px; }
-
-  .search-bar {
-    display: flex; align-items: center; gap: 8px;
-    background: var(--bg3);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 7px 12px;
-    width: 220px;
-    transition: border 0.15s;
-  }
-
-  .search-bar:focus-within { border-color: var(--border2); }
-
-  .search-bar svg { width: 13px; height: 13px; opacity: 0.4; flex-shrink: 0; }
-
-  .search-bar input {
-    background: none; border: none; outline: none;
-    color: var(--text);
-    font-size: 13px;
-    font-family: 'DM Sans', sans-serif;
-    width: 100%;
-  }
-
-  .search-bar input::placeholder { color: var(--text3); }
-
-  .btn {
-    display: inline-flex; align-items: center; gap: 6px;
-    padding: 8px 14px;
-    border-radius: 8px;
-    font-size: 13px;
-    font-weight: 500;
-    font-family: 'DM Sans', sans-serif;
-    cursor: pointer;
-    border: none;
-    transition: all 0.15s;
-    text-decoration: none;
-  }
-
-  .btn-primary {
-    background: var(--accent);
-    color: #0d0d0f;
-  }
-
-  .btn-primary:hover { background: var(--accent2); transform: translateY(-1px); }
-
-  .btn-ghost {
-    background: var(--bg3);
-    color: var(--text2);
-    border: 1px solid var(--border);
-  }
-
-  .btn-ghost:hover { background: var(--bg4); color: var(--text); }
-
-  .btn-sm { padding: 5px 10px; font-size: 12px; border-radius: 6px; }
-
-  /* PAGE CONTENT */
-  .page { padding: 28px; }
-
-  /* STAT CARDS */
-  .stats-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 14px;
-    margin-bottom: 28px;
-  }
-
-  .stat-card {
-    background: var(--bg2);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-lg);
-    padding: 18px 20px;
-    position: relative;
-    overflow: hidden;
-    transition: border-color 0.2s, transform 0.2s;
-    cursor: default;
-  }
-
-  .stat-card:hover { border-color: var(--border2); transform: translateY(-2px); }
-
-  .stat-card::before {
-    content: '';
-    position: absolute;
-    top: 0; right: 0;
-    width: 60px; height: 60px;
-    border-radius: 0 var(--radius-lg) 0 60px;
-    opacity: 0.06;
-  }
-
-  .stat-card.green::before { background: var(--green); }
-  .stat-card.amber::before { background: var(--amber); }
-  .stat-card.blue::before { background: var(--blue); }
-  .stat-card.accent::before { background: var(--accent); }
-
-  .stat-label {
-    font-size: 11px;
-    color: var(--text3);
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    margin-bottom: 10px;
-  }
-
-  .stat-value {
-    font-family: 'DM Serif Display', serif;
-    font-size: 32px;
-    letter-spacing: -0.03em;
-    line-height: 1;
-    margin-bottom: 6px;
-  }
-
-  .stat-card.green .stat-value { color: var(--green); }
-  .stat-card.amber .stat-value { color: var(--amber); }
-  .stat-card.blue .stat-value { color: var(--blue); }
-  .stat-card.accent .stat-value { color: var(--accent); }
-
-  .stat-delta {
-    font-size: 11px;
-    color: var(--text3);
-  }
-
-  .stat-delta .up { color: var(--green); }
-  .stat-delta .down { color: var(--red); }
-
-  /* FILTER ROW */
-  .filter-row {
-    display: flex; align-items: center; gap: 8px;
-    margin-bottom: 18px;
-  }
-
-  .filter-tab {
-    display: flex; align-items: center; gap: 6px;
-    padding: 6px 12px;
-    border-radius: 99px;
-    font-size: 12.5px;
-    font-weight: 400;
-    color: var(--text2);
-    cursor: pointer;
-    border: 1px solid transparent;
-    transition: all 0.15s;
-    background: none;
-    font-family: 'DM Sans', sans-serif;
-  }
-
-  .filter-tab:hover { background: var(--bg3); color: var(--text); }
-
-  .filter-tab.active {
-    background: var(--bg3);
-    border-color: var(--border2);
-    color: var(--text);
-    font-weight: 500;
-  }
-
-  .filter-dot {
-    width: 6px; height: 6px;
-    border-radius: 50%;
-    flex-shrink: 0;
-  }
-
-  .dot-green { background: var(--green); }
-  .dot-amber { background: var(--amber); }
-  .dot-red { background: var(--red); }
-  .dot-blue { background: var(--blue); }
-  .dot-gray { background: var(--text3); }
-
-  .filter-count {
-    font-size: 10px;
-    background: var(--bg4);
-    color: var(--text3);
-    padding: 1px 6px;
-    border-radius: 99px;
-  }
-
-  .filter-tab.active .filter-count {
-    background: var(--accent-dim);
-    color: var(--accent);
-  }
-
-  /* CAMPAIGN TABLE */
-  .table-wrapper {
-    background: var(--bg2);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-lg);
-    overflow: hidden;
-  }
-
-  .table-header {
-    display: flex; align-items: center;
-    padding: 14px 20px;
-    border-bottom: 1px solid var(--border);
-    gap: 12px;
-  }
-
-  .table-header-title {
-    font-size: 13px;
-    font-weight: 500;
-    color: var(--text);
-  }
-
-  .table-header-sub {
-    font-size: 12px;
-    color: var(--text3);
-  }
-
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 13px;
-  }
-
-  thead th {
-    text-align: left;
-    padding: 10px 20px;
-    font-size: 11px;
-    font-weight: 500;
-    color: var(--text3);
-    text-transform: uppercase;
-    letter-spacing: 0.07em;
-    border-bottom: 1px solid var(--border);
-    background: var(--bg2);
-    white-space: nowrap;
-  }
-
-  thead th:first-child { padding-left: 20px; }
-
-  tbody tr {
-    border-bottom: 1px solid var(--border);
-    transition: background 0.12s;
-    cursor: pointer;
-  }
-
-  tbody tr:last-child { border-bottom: none; }
-  tbody tr:hover { background: var(--bg3); }
-
-  tbody td {
-    padding: 14px 20px;
-    vertical-align: middle;
-    color: var(--text2);
-  }
-
-  tbody td:first-child { color: var(--text); }
-
-  .campaign-name-cell { display: flex; align-items: center; gap: 10px; }
-
-  .campaign-thumb {
-    width: 36px; height: 36px;
-    border-radius: 6px;
-    flex-shrink: 0;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 16px;
-  }
-
-  .campaign-name { font-size: 13.5px; font-weight: 500; color: var(--text); }
-  .campaign-type { font-size: 11px; color: var(--text3); margin-top: 1px; }
-
-  /* STATUS BADGES */
-  .badge {
-    display: inline-flex; align-items: center; gap: 5px;
-    padding: 3px 9px;
-    border-radius: 99px;
-    font-size: 11px;
-    font-weight: 500;
-    white-space: nowrap;
-  }
-
-  .badge-dot { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; }
-
-  .badge-live { background: var(--green-dim); color: var(--green); }
-  .badge-live .badge-dot { background: var(--green); animation: pulse 1.8s ease-in-out infinite; }
-
-  .badge-draft { background: var(--bg4); color: var(--text3); }
-  .badge-draft .badge-dot { background: var(--text3); }
-
-  .badge-scheduled { background: var(--blue-dim); color: var(--blue); }
-  .badge-scheduled .badge-dot { background: var(--blue); }
-
-  .badge-ended { background: var(--red-dim); color: var(--red); }
-  .badge-ended .badge-dot { background: var(--red); }
-
-  @keyframes pulse {
-    0%, 100% { opacity: 1; transform: scale(1); }
-    50% { opacity: 0.5; transform: scale(0.8); }
-  }
-
-  /* PROGRESS BAR */
-  .progress-wrap { width: 100%; }
-
-  .progress-bar {
-    height: 4px;
-    background: var(--bg4);
-    border-radius: 99px;
-    overflow: hidden;
-    margin-bottom: 4px;
-  }
-
-  .progress-fill {
-    height: 100%;
-    border-radius: 99px;
-    transition: width 0.3s;
-  }
-
-  .progress-label { font-size: 11px; color: var(--text3); }
-
-  /* ROW ACTIONS */
-  .row-actions {
-    display: flex; align-items: center; gap: 6px;
-    opacity: 0;
-    transition: opacity 0.15s;
-  }
-
-  tr:hover .row-actions { opacity: 1; }
-
-  .action-btn {
-    width: 28px; height: 28px;
-    border-radius: 6px;
-    background: var(--bg4);
-    border: 1px solid var(--border);
-    display: flex; align-items: center; justify-content: center;
-    cursor: pointer;
-    transition: all 0.15s;
-    color: var(--text2);
-  }
-
-  .action-btn:hover { background: var(--bg3); border-color: var(--border2); color: var(--text); }
-
-  .action-btn svg { width: 13px; height: 13px; }
-
-  .toggle-btn {
-    position: relative;
-    width: 36px; height: 20px;
-    border-radius: 99px;
-    cursor: pointer;
-    border: none;
-    transition: background 0.2s;
-    flex-shrink: 0;
-  }
-
-  .toggle-btn.on { background: var(--accent); }
-  .toggle-btn.off { background: var(--bg4); }
-
-  .toggle-btn::after {
-    content: '';
-    position: absolute;
-    top: 3px;
-    width: 14px; height: 14px;
-    border-radius: 50%;
-    background: white;
-    transition: left 0.2s;
-  }
-
-  .toggle-btn.on::after { left: 19px; }
-  .toggle-btn.off::after { left: 3px; background: var(--text3); }
-
-  /* MODAL */
-  .modal-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.6);
-    backdrop-filter: blur(4px);
-    z-index: 200;
-    display: flex; align-items: center; justify-content: center;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.2s;
-  }
-
-  .modal-overlay.visible {
-    opacity: 1;
-    pointer-events: all;
-  }
-
-  .modal {
-    background: var(--bg2);
-    border: 1px solid var(--border2);
-    border-radius: 16px;
-    width: 480px;
-    max-width: 90vw;
-    padding: 28px;
-    transform: translateY(12px);
-    transition: transform 0.2s;
-  }
-
-  .modal-overlay.visible .modal { transform: translateY(0); }
-
-  .modal-header {
-    display: flex; align-items: flex-start; justify-content: space-between;
-    margin-bottom: 24px;
-  }
-
-  .modal-title {
-    font-family: 'DM Serif Display', serif;
-    font-size: 20px;
-    color: var(--text);
-    letter-spacing: -0.02em;
-  }
-
-  .modal-close {
-    width: 28px; height: 28px;
-    border-radius: 6px;
-    background: var(--bg3);
-    border: none;
-    cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
-    color: var(--text3);
-    transition: all 0.15s;
-  }
-
-  .modal-close:hover { background: var(--bg4); color: var(--text); }
-
-  .form-group { margin-bottom: 18px; }
-
-  .form-label {
-    display: block;
-    font-size: 12px;
-    font-weight: 500;
-    color: var(--text2);
-    margin-bottom: 7px;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-  }
-
-  .form-input {
-    width: 100%;
-    background: var(--bg3);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 9px 12px;
-    color: var(--text);
-    font-size: 13.5px;
-    font-family: 'DM Sans', sans-serif;
-    outline: none;
-    transition: border 0.15s;
-  }
-
-  .form-input:focus { border-color: var(--accent); }
-  .form-input::placeholder { color: var(--text3); }
-
-  select.form-input { cursor: pointer; }
-
-  .form-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-  }
-
-  .modal-footer {
-    display: flex; justify-content: flex-end; gap: 10px;
-    margin-top: 24px;
-    padding-top: 20px;
-    border-top: 1px solid var(--border);
-  }
-
-  /* TOAST */
-  .toast-container {
-    position: fixed;
-    bottom: 24px; right: 24px;
-    z-index: 300;
-    display: flex; flex-direction: column; gap: 8px;
-  }
-
-  .toast {
-    display: flex; align-items: center; gap: 10px;
-    padding: 12px 16px;
-    background: var(--bg3);
-    border: 1px solid var(--border2);
-    border-radius: 10px;
-    font-size: 13px;
-    color: var(--text);
-    box-shadow: 0 4px 24px rgba(0,0,0,0.4);
-    transform: translateX(100px);
-    opacity: 0;
-    transition: all 0.25s cubic-bezier(0.34,1.56,0.64,1);
-    min-width: 240px;
-  }
-
-  .toast.show { transform: translateX(0); opacity: 1; }
-
-  .toast-icon { width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-  .toast-success .toast-icon { background: var(--green-dim); color: var(--green); }
-  .toast-warning .toast-icon { background: var(--amber-dim); color: var(--amber); }
-
-  /* TIMELINE INDICATOR */
-  .timeline-cell {
-    font-size: 11.5px;
-    color: var(--text3);
-    line-height: 1.6;
-  }
-
-  /* EMPTY */
-  .table-empty {
-    padding: 48px 20px;
-    text-align: center;
-    color: var(--text3);
-    font-size: 13px;
-  }
-
-  /* PAGE FADE-IN */
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  .animate { animation: fadeUp 0.4s ease both; }
-  .delay-1 { animation-delay: 0.05s; }
-  .delay-2 { animation-delay: 0.1s; }
-  .delay-3 { animation-delay: 0.15s; }
-  .delay-4 { animation-delay: 0.2s; }
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CampaignOS — 行銷活動管理系統</title>
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
+
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="_css/main.css">
+
+  <!-- Tailwind Config -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans:    ['DM Sans', 'sans-serif'],
+            display: ['DM Serif Display', 'serif'],
+          },
+          colors: {
+            bg:      '#0d0d0f',
+            bg2:     '#141416',
+            bg3:     '#1c1c20',
+            bg4:     '#242428',
+            accent:  '#c8f135',
+            accent2: '#a8d020',
+            green:   '#34d399',
+            amber:   '#fbbf24',
+            red:     '#f87171',
+            blue:    '#60a5fa',
+          }
+        }
+      }
+    }
+  </script>
 </head>
-<body>
 
-<!-- SIDEBAR -->
-<aside class="sidebar">
-  <div class="logo">
-    <div class="logo-mark">
-      <div class="logo-icon">
-        <svg viewBox="0 0 16 16" fill="none">
-          <path d="M3 8h10M8 3v10" stroke="#0d0d0f" stroke-width="2" stroke-linecap="round"/>
-          <rect x="1" y="1" width="14" height="14" rx="3" stroke="#0d0d0f" stroke-width="1.5" fill="none"/>
+<body class="flex min-h-screen" style="background:var(--bg);color:var(--text)">
+
+  <!-- ============================================================
+       SIDEBAR OVERLAY (mobile)
+  ============================================================ -->
+  <div id="sidebarOverlay"
+       class="hidden fixed inset-0 z-50 md:hidden"
+       style="background:rgba(0,0,0,0.5)"></div>
+
+  <!-- ============================================================
+       SIDEBAR
+  ============================================================ -->
+  <aside id="sidebar"
+         class="fixed top-0 left-0 min-h-screen z-50 flex flex-col"
+         style="background:var(--bg2);border-right:1px solid var(--border)">
+
+    <!-- Logo -->
+    <div class="flex items-center justify-between px-4 py-5"
+         style="border-bottom:1px solid var(--border)">
+      <div class="logo-mark flex items-center gap-2">
+        <div class="flex items-center justify-center rounded-lg flex-shrink-0"
+             style="width:28px;height:28px;background:var(--accent)">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+            <path d="M3 8h10M8 3v10" stroke="#0d0d0f" stroke-width="2" stroke-linecap="round"/>
+            <rect x="1" y="1" width="14" height="14" rx="3" stroke="#0d0d0f" stroke-width="1.5" fill="none"/>
+          </svg>
+        </div>
+        <div class="logo-text-wrap" style="transition:opacity .2s,width .2s">
+          <div class="font-display text-sm leading-tight" style="color:var(--text)">CampaignOS</div>
+          <div class="text-xs mt-0.5 tracking-widest uppercase" style="color:var(--text3)">行銷活動管理</div>
+        </div>
+      </div>
+
+      <!-- Collapse toggle button -->
+      <button id="sidebarToggle"
+              class="flex items-center justify-center rounded-lg flex-shrink-0 cursor-pointer"
+              style="width:26px;height:26px;background:var(--bg3);border:1px solid var(--border);color:var(--text2)"
+              title="收合側欄">
+        <svg id="toggleIcon" width="12" height="12" viewBox="0 0 16 16" fill="none">
+          <path d="M10 3L5 8l5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
-      </div>
-      <span class="logo-text">CampaignOS</span>
-    </div>
-    <div class="logo-sub">行銷活動管理</div>
-  </div>
-
-  <nav class="nav">
-    <div class="nav-section-label">主選單</div>
-
-    <a href="#" class="nav-item active">
-      <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><rect x="1" y="1" width="6" height="6" rx="1.5" fill="currentColor" opacity=".9"/><rect x="9" y="1" width="6" height="6" rx="1.5" fill="currentColor" opacity=".5"/><rect x="1" y="9" width="6" height="6" rx="1.5" fill="currentColor" opacity=".5"/><rect x="9" y="9" width="6" height="6" rx="1.5" fill="currentColor" opacity=".3"/></svg>
-      所有活動
-      <span class="nav-badge">12</span>
-    </a>
-
-    <a href="#" class="nav-item">
-      <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="3" fill="currentColor"/><circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.5" fill="none"/></svg>
-      上架中
-      <span class="nav-badge">5</span>
-    </a>
-
-    <a href="#" class="nav-item">
-      <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><rect x="1.5" y="3.5" width="13" height="10" rx="1.5" stroke="currentColor" stroke-width="1.5" fill="none"/><path d="M5 3.5V2M11 3.5V2M1.5 7h13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-      排程活動
-      <span class="nav-badge">3</span>
-    </a>
-
-    <a href="#" class="nav-item">
-      <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><path d="M2 4h12M2 8h8M2 12h5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-      草稿
-      <span class="nav-badge">4</span>
-    </a>
-
-    <div class="nav-section-label">管理</div>
-
-    <a href="#" class="nav-item">
-      <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="5" r="3" stroke="currentColor" stroke-width="1.5" fill="none"/><path d="M2 14c0-3.314 2.686-5 6-5s6 1.686 6 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-      成員權限
-    </a>
-
-    <a href="#" class="nav-item">
-      <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M8 3l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      操作日誌
-    </a>
-
-  </nav>
-
-  <div class="sidebar-footer">
-    <div class="user-card">
-      <div class="avatar">陳</div>
-      <div class="user-info">
-        <div class="user-name">陳小明</div>
-        <div class="user-role">審核者</div>
-      </div>
-    </div>
-  </div>
-</aside>
-
-<!-- MAIN -->
-<main class="main">
-  <div class="topbar">
-    <span class="topbar-title">活動總覽</span>
-    <div class="topbar-right">
-      <div class="search-bar">
-        <svg viewBox="0 0 16 16" fill="none"><circle cx="7" cy="7" r="4.5" stroke="currentColor" stroke-width="1.5"/><path d="M10.5 10.5L14 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-        <input type="text" placeholder="搜尋活動名稱…" id="searchInput">
-      </div>
-      <button class="btn btn-ghost btn-sm" onclick="showToast('篩選功能開發中', 'warning')">
-        <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M2 4h12M5 8h6M7 12h2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-        篩選
-      </button>
-      <button class="btn btn-primary btn-sm" onclick="openModal()">
-        <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M8 2v12M2 8h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-        建立活動
-      </button>
-    </div>
-  </div>
-
-  <div class="page">
-
-    <!-- STATS -->
-    <div class="stats-grid animate">
-      <div class="stat-card green">
-        <div class="stat-label">上架中</div>
-        <div class="stat-value">5</div>
-        <div class="stat-delta"><span class="up">↑ 2</span> 較上週</div>
-      </div>
-      <div class="stat-card amber">
-        <div class="stat-label">排程中</div>
-        <div class="stat-value">3</div>
-        <div class="stat-delta">本週即將上架</div>
-      </div>
-      <div class="stat-card blue">
-        <div class="stat-label">草稿</div>
-        <div class="stat-value">4</div>
-        <div class="stat-delta"><span class="down">↓ 1</span> 較上週</div>
-      </div>
-      <div class="stat-card accent">
-        <div class="stat-label">本月總活動數</div>
-        <div class="stat-value">12</div>
-        <div class="stat-delta"><span class="up">↑ 33%</span> 較上月</div>
-      </div>
-    </div>
-
-    <!-- FILTERS -->
-    <div class="filter-row animate delay-2">
-      <button class="filter-tab active" onclick="filterCampaigns('all', this)">
-        全部
-        <span class="filter-count">12</span>
-      </button>
-      <button class="filter-tab" onclick="filterCampaigns('live', this)">
-        <span class="filter-dot dot-green"></span>上架中
-        <span class="filter-count">5</span>
-      </button>
-      <button class="filter-tab" onclick="filterCampaigns('scheduled', this)">
-        <span class="filter-dot dot-blue"></span>排程中
-        <span class="filter-count">3</span>
-      </button>
-      <button class="filter-tab" onclick="filterCampaigns('draft', this)">
-        <span class="filter-dot dot-gray"></span>草稿
-        <span class="filter-count">4</span>
       </button>
     </div>
 
-    <!-- TABLE -->
-    <div class="table-wrapper animate delay-3">
-      <div class="table-header">
-        <span class="table-header-title">行銷活動列表</span>
-        <span class="table-header-sub">共顯示 <span id="campaignCount">12</span> 筆</span>
+    <!-- Nav -->
+    <nav class="flex flex-col gap-0.5 p-3 flex-1 overflow-y-auto overflow-x-hidden">
+
+      <span class="section-label nav-label px-2 pt-2 pb-1 text-xs tracking-widest uppercase"
+            style="color:var(--text3)">主選單</span>
+
+      <a href="#" class="nav-item active" data-tip="所有活動">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" class="flex-shrink-0">
+          <rect x="1" y="1" width="6" height="6" rx="1.5" fill="currentColor" opacity=".9"/>
+          <rect x="9" y="1" width="6" height="6" rx="1.5" fill="currentColor" opacity=".5"/>
+          <rect x="1" y="9" width="6" height="6" rx="1.5" fill="currentColor" opacity=".5"/>
+          <rect x="9" y="9" width="6" height="6" rx="1.5" fill="currentColor" opacity=".3"/>
+        </svg>
+        <span class="nav-label flex-1">所有活動</span>
+        <span class="nav-badge" id="nb-all">12</span>
+      </a>
+
+      <a href="#" class="nav-item" data-tip="上架中"
+         onclick="CampaignUI.setFilter('live', this.parentElement.querySelector('.active')||this); document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active')); this.classList.add('active'); return false;">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" class="flex-shrink-0">
+          <circle cx="8" cy="8" r="3" fill="currentColor"/>
+          <circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.5" fill="none"/>
+        </svg>
+        <span class="nav-label flex-1">上架中</span>
+        <span class="nav-badge" id="nb-live">5</span>
+      </a>
+
+      <a href="#" class="nav-item" data-tip="排程活動">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" class="flex-shrink-0">
+          <rect x="1.5" y="3.5" width="13" height="10" rx="1.5" stroke="currentColor" stroke-width="1.5" fill="none"/>
+          <path d="M5 3.5V2M11 3.5V2M1.5 7h13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        <span class="nav-label flex-1">排程活動</span>
+        <span class="nav-badge" id="nb-scheduled">3</span>
+      </a>
+
+      <a href="#" class="nav-item" data-tip="草稿">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" class="flex-shrink-0">
+          <path d="M2 4h12M2 8h8M2 12h5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        <span class="nav-label flex-1">草稿</span>
+        <span class="nav-badge" id="nb-draft">4</span>
+      </a>
+
+      <span class="section-label nav-label px-2 pt-4 pb-1 text-xs tracking-widest uppercase"
+            style="color:var(--text3)">管理</span>
+
+      <a href="#" class="nav-item" data-tip="成員權限">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" class="flex-shrink-0">
+          <circle cx="8" cy="5" r="3" stroke="currentColor" stroke-width="1.5" fill="none"/>
+          <path d="M2 14c0-3.314 2.686-5 6-5s6 1.686 6 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        <span class="nav-label flex-1">成員權限</span>
+      </a>
+
+      <a href="#" class="nav-item" data-tip="操作日誌">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" class="flex-shrink-0">
+          <path d="M3 3h10v10H3zM6 6h4M6 9h2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" fill="none"/>
+        </svg>
+        <span class="nav-label flex-1">操作日誌</span>
+      </a>
+
+    </nav>
+
+    <!-- User -->
+    <div class="p-3" style="border-top:1px solid var(--border)">
+      <div class="user-card flex items-center gap-2.5 rounded-lg px-2.5 py-2 cursor-pointer"
+           style="transition:background .15s"
+           onmouseenter="this.style.background='var(--bg3)'"
+           onmouseleave="this.style.background=''">
+        <div class="flex items-center justify-center rounded-full flex-shrink-0 text-xs font-medium"
+             style="width:28px;height:28px;background:linear-gradient(135deg,#c8f135,#60a5fa);color:#000">
+          陳
+        </div>
+        <div class="user-info" style="transition:opacity .2s,width .2s;min-width:0">
+          <div class="text-xs font-medium truncate" style="color:var(--text)">陳小明</div>
+          <div class="text-xs truncate" style="color:var(--text3)">審核者</div>
+        </div>
       </div>
-      <table>
-        <thead>
-          <tr>
-            <th>活動名稱</th>
-            <th>狀態</th>
-            <th>上架時間</th>
-            <th>下架時間</th>
-            <th>進度</th>
-            <th>建立者</th>
-            <th>操作</th>
-          </tr>
-        </thead>
-        <tbody id="campaignTable"></tbody>
-      </table>
     </div>
 
-  </div>
-</main>
+  </aside><!-- /sidebar -->
 
-<!-- MODAL -->
-<div class="modal-overlay" id="modal" onclick="handleOverlayClick(event)">
-  <div class="modal">
-    <div class="modal-header">
-      <div>
-        <div class="modal-title">建立新活動</div>
-        <div style="font-size:12px;color:var(--text3);margin-top:4px">填寫基本資訊以建立草稿</div>
-      </div>
-      <button class="modal-close" onclick="closeModal()">
-        <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M2 2l12 12M14 2L2 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+
+  <!-- ============================================================
+       MAIN CONTENT
+  ============================================================ -->
+  <div id="main-content" class="flex flex-col flex-1 min-h-screen">
+
+    <!-- TOP BAR -->
+    <header class="sticky top-0 z-40 flex items-center gap-4 px-7"
+            style="height:var(--topbar-h);background:var(--bg);border-bottom:1px solid var(--border)">
+
+      <!-- Mobile hamburger -->
+      <button class="md:hidden flex items-center justify-center rounded-lg"
+              style="width:32px;height:32px;background:var(--bg3);border:1px solid var(--border);color:var(--text2)"
+              onclick="CampaignUI.init()">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+          <path d="M2 4h12M2 8h12M2 12h12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
       </button>
-    </div>
 
-    <div class="form-group">
-      <label class="form-label">活動名稱 *</label>
-      <input type="text" class="form-input" placeholder="e.g. 618 夏季購物節" id="newName">
-    </div>
+      <h1 class="font-display text-xl tracking-tight" style="color:var(--text)">活動總覽</h1>
 
-    <div class="form-group">
-      <label class="form-label">活動類型</label>
-      <select class="form-input" id="newType">
-        <option value="🛒">🛒 電商促銷</option>
-        <option value="🎉">🎉 節慶活動</option>
-        <option value="📧">📧 Email 行銷</option>
-        <option value="📱">📱 社群推廣</option>
-        <option value="🎯">🎯 精準投放</option>
-      </select>
-    </div>
+      <div class="ml-auto flex items-center gap-2.5">
 
-    <div class="form-row">
-      <div class="form-group">
-        <label class="form-label">上架日期</label>
-        <input type="date" class="form-input" id="newStart">
+        <!-- Search -->
+        <div class="flex items-center gap-2 rounded-lg px-3 py-1.5"
+             style="background:var(--bg3);border:1px solid var(--border);width:220px;transition:border .15s"
+             onfocusin="this.style.borderColor='var(--border2)'"
+             onfocusout="this.style.borderColor='var(--border)'">
+          <svg width="13" height="13" viewBox="0 0 16 16" fill="none" style="opacity:.4;flex-shrink:0">
+            <circle cx="7" cy="7" r="4.5" stroke="currentColor" stroke-width="1.5"/>
+            <path d="M10.5 10.5L14 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+          <input id="searchInput" type="text" placeholder="搜尋活動…"
+                 class="bg-transparent border-none outline-none text-sm w-full font-sans"
+                 style="color:var(--text)"
+                 placeholder-style="color:var(--text3)">
+        </div>
+
+        <!-- Create button -->
+        <button onclick="CampaignUI.openCreateModal(); document.dispatchEvent(new Event('modalOpened'))"
+                class="flex items-center gap-1.5 text-xs font-medium rounded-lg px-3 py-2 cursor-pointer"
+                style="background:var(--accent);color:#0d0d0f;transition:background .15s,transform .15s;border:none"
+                onmouseenter="this.style.background='var(--accent2)';this.style.transform='translateY(-1px)'"
+                onmouseleave="this.style.background='var(--accent)';this.style.transform=''">
+          <svg width="11" height="11" viewBox="0 0 16 16" fill="none">
+            <path d="M8 2v12M2 8h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+          建立活動
+        </button>
+
       </div>
-      <div class="form-group">
-        <label class="form-label">下架日期</label>
-        <input type="date" class="form-input" id="newEnd">
+    </header><!-- /topbar -->
+
+    <!-- PAGE BODY -->
+    <main class="p-7">
+
+      <!-- ── STATS ── -->
+      <div class="grid grid-cols-4 gap-3.5 mb-7 animate-in">
+        <!-- Live -->
+        <div class="stat-card p-5 relative overflow-hidden">
+          <div class="text-xs uppercase tracking-widest mb-2.5" style="color:var(--text3)">上架中</div>
+          <div class="font-display text-3xl leading-none mb-1.5" style="color:var(--green)" id="stat-live">5</div>
+          <div class="text-xs" style="color:var(--text3)"><span style="color:var(--green)">↑ 2</span> 較上週</div>
+          <div class="absolute top-0 right-0 w-14 h-14 rounded-bl-full" style="background:var(--green);opacity:.06"></div>
+        </div>
+        <!-- Scheduled -->
+        <div class="stat-card p-5 relative overflow-hidden">
+          <div class="text-xs uppercase tracking-widest mb-2.5" style="color:var(--text3)">排程中</div>
+          <div class="font-display text-3xl leading-none mb-1.5" style="color:var(--amber)" id="stat-scheduled">3</div>
+          <div class="text-xs" style="color:var(--text3)">本週即將上架</div>
+          <div class="absolute top-0 right-0 w-14 h-14 rounded-bl-full" style="background:var(--amber);opacity:.06"></div>
+        </div>
+        <!-- Draft -->
+        <div class="stat-card p-5 relative overflow-hidden">
+          <div class="text-xs uppercase tracking-widest mb-2.5" style="color:var(--text3)">草稿</div>
+          <div class="font-display text-3xl leading-none mb-1.5" style="color:var(--blue)" id="stat-draft">4</div>
+          <div class="text-xs" style="color:var(--text3)"><span style="color:var(--red)">↓ 1</span> 較上週</div>
+          <div class="absolute top-0 right-0 w-14 h-14 rounded-bl-full" style="background:var(--blue);opacity:.06"></div>
+        </div>
+        <!-- Total -->
+        <div class="stat-card p-5 relative overflow-hidden">
+          <div class="text-xs uppercase tracking-widest mb-2.5" style="color:var(--text3)">本月總活動</div>
+          <div class="font-display text-3xl leading-none mb-1.5" style="color:var(--accent)" id="stat-total">12</div>
+          <div class="text-xs" style="color:var(--text3)"><span style="color:var(--green)">↑ 33%</span> 較上月</div>
+          <div class="absolute top-0 right-0 w-14 h-14 rounded-bl-full" style="background:var(--accent);opacity:.06"></div>
+        </div>
       </div>
-    </div>
 
-    <div class="form-group">
-      <label class="form-label">建立者</label>
-      <input type="text" class="form-input" placeholder="負責行銷人員姓名" id="newOwner">
-    </div>
+      <!-- ── FILTER TABS ── -->
+      <div class="flex items-center gap-2 mb-4 animate-in delay-2">
+        <button class="filter-tab active" onclick="CampaignUI.setFilter('all', this)">
+          全部 <span class="filter-count" id="fc-all">12</span>
+        </button>
+        <button class="filter-tab" onclick="CampaignUI.setFilter('live', this)">
+          <span class="dot" style="background:var(--green)"></span>
+          上架中 <span class="filter-count" id="fc-live">5</span>
+        </button>
+        <button class="filter-tab" onclick="CampaignUI.setFilter('scheduled', this)">
+          <span class="dot" style="background:var(--blue)"></span>
+          排程中 <span class="filter-count" id="fc-sched">3</span>
+        </button>
+        <button class="filter-tab" onclick="CampaignUI.setFilter('draft', this)">
+          <span class="dot" style="background:var(--text3)"></span>
+          草稿 <span class="filter-count" id="fc-draft">4</span>
+        </button>
+        <button class="filter-tab" onclick="CampaignUI.setFilter('ended', this)">
+          <span class="dot" style="background:var(--red)"></span>
+          已下架 <span class="filter-count" id="fc-ended">0</span>
+        </button>
+      </div>
 
-    <div class="modal-footer">
-      <button class="btn btn-ghost" onclick="closeModal()">取消</button>
-      <button class="btn btn-primary" onclick="createCampaign()">建立草稿</button>
-    </div>
-  </div>
-</div>
+      <!-- ── TABLE ── -->
+      <div class="animate-in delay-3 rounded-xl overflow-hidden"
+           style="background:var(--bg2);border:1px solid var(--border)">
 
-<!-- TOASTS -->
-<div class="toast-container" id="toastContainer"></div>
+        <!-- Table header bar -->
+        <div class="flex items-center gap-3 px-5 py-3.5"
+             style="border-bottom:1px solid var(--border)">
+          <span class="text-sm font-medium" style="color:var(--text)">行銷活動列表</span>
+          <span class="text-xs" style="color:var(--text3)">
+            共顯示 <span id="campaignCount">12</span> 筆
+          </span>
+        </div>
 
-<script>
-const campaigns = [
-  { id:1, name:'618 夏季購物節', type:'🛒', status:'live', start:'2025-06-01', end:'2025-06-18', owner:'王小華', progress:62 },
-  { id:2, name:'母親節限定優惠', type:'🎉', status:'live', start:'2025-05-08', end:'2025-05-12', owner:'陳小明', progress:90 },
-  { id:3, name:'新品上市推廣', type:'📱', status:'live', start:'2025-06-10', end:'2025-06-30', owner:'林美玲', progress:35 },
-  { id:4, name:'VIP 會員早鳥活動', type:'🎯', status:'live', start:'2025-06-05', end:'2025-06-15', owner:'張大偉', progress:78 },
-  { id:5, name:'端午節限定好禮', type:'🎉', status:'live', start:'2025-06-09', end:'2025-06-11', owner:'王小華', progress:55 },
-  { id:6, name:'暑假旅遊特輯', type:'📧', status:'scheduled', start:'2025-07-01', end:'2025-08-31', owner:'陳小明', progress:0 },
-  { id:7, name:'七夕情人節活動', type:'🎉', status:'scheduled', start:'2025-08-05', end:'2025-08-07', owner:'林美玲', progress:0 },
-  { id:8, name:'週年慶預熱', type:'🛒', status:'scheduled', start:'2025-09-01', end:'2025-09-10', owner:'張大偉', progress:0 },
-  { id:9, name:'Q3 品牌形象廣告', type:'📱', status:'draft', start:'—', end:'—', owner:'王小華', progress:0 },
-  { id:10, name:'雙 11 預備企劃', type:'🛒', status:'draft', start:'—', end:'—', owner:'林美玲', progress:0 },
-  { id:11, name:'聖誕節倒數活動', type:'🎉', status:'draft', start:'—', end:'—', owner:'陳小明', progress:0 },
-  { id:12, name:'新年跨年直播', type:'📱', status:'draft', start:'—', end:'—', owner:'張大偉', progress:0 },
-];
+        <!-- Scrollable table -->
+        <div class="overflow-x-auto">
+          <table class="w-full border-collapse text-sm">
+            <thead>
+              <tr style="border-bottom:1px solid var(--border)">
+                <th class="text-left px-5 py-2.5 text-xs uppercase tracking-wider font-medium whitespace-nowrap"
+                    style="color:var(--text3)">活動名稱</th>
+                <th class="text-left px-5 py-2.5 text-xs uppercase tracking-wider font-medium whitespace-nowrap"
+                    style="color:var(--text3)">狀態</th>
+                <th class="text-left px-5 py-2.5 text-xs uppercase tracking-wider font-medium whitespace-nowrap"
+                    style="color:var(--text3)">上架日期</th>
+                <th class="text-left px-5 py-2.5 text-xs uppercase tracking-wider font-medium whitespace-nowrap"
+                    style="color:var(--text3)">下架日期</th>
+                <th class="text-left px-5 py-2.5 text-xs uppercase tracking-wider font-medium whitespace-nowrap"
+                    style="color:var(--text3)">進度</th>
+                <th class="text-left px-5 py-2.5 text-xs uppercase tracking-wider font-medium whitespace-nowrap"
+                    style="color:var(--text3)">負責人</th>
+                <th class="text-left px-5 py-2.5 text-xs uppercase tracking-wider font-medium whitespace-nowrap"
+                    style="color:var(--text3)">操作</th>
+              </tr>
+            </thead>
+            <tbody id="campaignTable"></tbody>
+          </table>
+        </div>
 
-let currentFilter = 'all';
-let currentSearch = '';
+      </div><!-- /table wrapper -->
 
-function getStatusBadge(status) {
-  const map = {
-    live: `<span class="badge badge-live"><span class="badge-dot"></span>上架中</span>`,
-    scheduled: `<span class="badge badge-scheduled"><span class="badge-dot"></span>排程中</span>`,
-    draft: `<span class="badge badge-draft"><span class="badge-dot"></span>草稿</span>`,
-    ended: `<span class="badge badge-ended"><span class="badge-dot"></span>已下架</span>`,
-  };
-  return map[status] || '';
-}
+    </main>
 
-function getProgressColor(p) {
-  if (p >= 70) return 'var(--green)';
-  if (p >= 30) return 'var(--amber)';
-  return 'var(--blue)';
-}
+  </div><!-- /main-content -->
 
-function renderTable() {
-  const tbody = document.getElementById('campaignTable');
-  let filtered = campaigns.filter(c => {
-    const matchFilter = currentFilter === 'all' || c.status === currentFilter;
-    const matchSearch = c.name.toLowerCase().includes(currentSearch.toLowerCase()) || c.owner.includes(currentSearch);
-    return matchFilter && matchSearch;
-  });
 
-  document.getElementById('campaignCount').textContent = filtered.length;
+  <!-- ============================================================
+       MODAL — Create / Edit Campaign
+  ============================================================ -->
+  <div id="campaignModal" class="modal-overlay">
+    <div class="modal-box rounded-2xl w-full max-w-lg mx-4 p-7"
+         style="background:var(--bg2);border:1px solid var(--border2)">
 
-  if (!filtered.length) {
-    tbody.innerHTML = `<tr><td colspan="7"><div class="table-empty">找不到符合條件的活動</div></td></tr>`;
-    return;
-  }
+      <!-- Header -->
+      <div class="flex items-start justify-between mb-6">
+        <div>
+          <h2 id="modalTitle" class="font-display text-xl" style="color:var(--text)">建立新活動</h2>
+          <p class="text-xs mt-1" style="color:var(--text3)">填寫基本資訊以建立草稿</p>
+        </div>
+        <button onclick="CampaignUI.closeModal()"
+                class="flex items-center justify-center rounded-lg cursor-pointer"
+                style="width:28px;height:28px;background:var(--bg3);border:none;color:var(--text3)">
+          <svg width="11" height="11" viewBox="0 0 16 16" fill="none">
+            <path d="M2 2l12 12M14 2L2 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </button>
+      </div>
 
-  tbody.innerHTML = filtered.map(c => {
-    const progressHtml = c.progress > 0
-      ? `<div class="progress-wrap"><div class="progress-bar"><div class="progress-fill" style="width:${c.progress}%;background:${getProgressColor(c.progress)}"></div></div><div class="progress-label">${c.progress}%</div></div>`
-      : `<span style="color:var(--text3);font-size:12px">—</span>`;
+      <!-- Form -->
+      <div class="flex flex-col gap-4">
 
-    const toggleClass = c.status === 'live' ? 'on' : 'off';
-    const canToggle = c.status === 'live' || c.status === 'draft' || c.status === 'scheduled';
+        <!-- Name -->
+        <div>
+          <label class="block text-xs font-medium uppercase tracking-wider mb-1.5" style="color:var(--text2)">
+            活動名稱 *
+          </label>
+          <input id="fName" type="text" class="form-input" placeholder="例如：618 夏季購物節">
+        </div>
 
-    return `
-    <tr>
-      <td>
-        <div class="campaign-name-cell">
-          <div class="campaign-thumb" style="background:var(--bg4)">${c.type}</div>
+        <!-- Type + Owner -->
+        <div class="grid grid-cols-2 gap-3">
           <div>
-            <div class="campaign-name">${c.name}</div>
-            <div class="campaign-type"># ${c.id}</div>
+            <label class="block text-xs font-medium uppercase tracking-wider mb-1.5" style="color:var(--text2)">
+              活動類型
+            </label>
+            <select id="fType" class="form-input">
+              <option value="🛒" data-name="電商促銷">🛒 電商促銷</option>
+              <option value="🎉" data-name="節慶活動">🎉 節慶活動</option>
+              <option value="📧" data-name="Email 行銷">📧 Email 行銷</option>
+              <option value="📱" data-name="社群推廣">📱 社群推廣</option>
+              <option value="🎯" data-name="精準投放">🎯 精準投放</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-medium uppercase tracking-wider mb-1.5" style="color:var(--text2)">
+              負責人
+            </label>
+            <input id="fOwner" type="text" class="form-input" placeholder="負責行銷人員">
           </div>
         </div>
-      </td>
-      <td>${getStatusBadge(c.status)}</td>
-      <td><div class="timeline-cell">${c.start}</div></td>
-      <td><div class="timeline-cell">${c.end}</div></td>
-      <td>${progressHtml}</td>
-      <td style="font-size:12.5px">${c.owner}</td>
-      <td>
-        <div class="row-actions">
-          ${canToggle ? `<button class="toggle-btn ${toggleClass}" title="${c.status==='live'?'下架':'上架'}" onclick="toggleStatus(${c.id}, event)"></button>` : '<span style="width:36px;display:inline-block"></span>'}
-          <div class="action-btn" title="預覽" onclick="showToast('預覽: ${c.name}', 'success')">
-            <svg viewBox="0 0 16 16" fill="none"><path d="M1.5 8C3.5 4.5 12.5 4.5 14.5 8C12.5 11.5 3.5 11.5 1.5 8Z" stroke="currentColor" stroke-width="1.3" fill="none"/><circle cx="8" cy="8" r="2" fill="currentColor"/></svg>
+
+        <!-- Start + End Date -->
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-medium uppercase tracking-wider mb-1.5" style="color:var(--text2)">
+              上架日期
+            </label>
+            <input id="fStart" type="date" class="form-input">
           </div>
-          <div class="action-btn" title="編輯" onclick="showToast('進入編輯: ${c.name}', 'success')">
-            <svg viewBox="0 0 16 16" fill="none"><path d="M10 3l3 3L5 14H2v-3L10 3z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round" fill="none"/></svg>
-          </div>
-          <div class="action-btn" title="刪除" onclick="deleteCampaign(${c.id})">
-            <svg viewBox="0 0 16 16" fill="none"><path d="M3 5h10M6 5V3h4v2M6 8v4M10 8v4M4 5l1 8h6l1-8" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+          <div>
+            <label class="block text-xs font-medium uppercase tracking-wider mb-1.5" style="color:var(--text2)">
+              下架日期
+            </label>
+            <input id="fEnd" type="date" class="form-input">
           </div>
         </div>
-      </td>
-    </tr>`;
-  }).join('');
-}
 
-function toggleStatus(id, e) {
-  e.stopPropagation();
-  const c = campaigns.find(x => x.id === id);
-  if (!c) return;
-  if (c.status === 'live') {
-    c.status = 'ended';
-    showToast(`已下架：${c.name}`, 'warning');
-  } else if (c.status === 'draft' || c.status === 'scheduled') {
-    c.status = 'live';
-    c.progress = 5;
-    showToast(`已上架：${c.name}`, 'success');
-  }
-  renderTable();
-}
+        <!-- Description -->
+        <div>
+          <label class="block text-xs font-medium uppercase tracking-wider mb-1.5" style="color:var(--text2)">
+            活動描述
+          </label>
+          <textarea id="fDesc" class="form-input resize-none" rows="2"
+                    placeholder="簡述活動內容（選填）"></textarea>
+        </div>
 
-function deleteCampaign(id) {
-  const c = campaigns.find(x => x.id === id);
-  if (!c) return;
-  if (c.status === 'live') {
-    showToast('請先下架活動再刪除', 'warning');
-    return;
-  }
-  if (confirm(`確定要刪除「${c.name}」？此操作無法復原。`)) {
-    const idx = campaigns.findIndex(x => x.id === id);
-    campaigns.splice(idx, 1);
-    showToast(`已刪除：${c.name}`, 'success');
-    renderTable();
-  }
-}
+        <!-- Image Upload -->
+        <div>
+          <label class="block text-xs font-medium uppercase tracking-wider mb-1.5" style="color:var(--text2)">
+            主視覺圖片
+          </label>
+          <div id="uploadZone" class="upload-zone relative flex flex-col items-center justify-center gap-2 p-5 text-center"
+               style="min-height:110px">
 
-function filterCampaigns(type, btn) {
-  currentFilter = type;
-  document.querySelectorAll('.filter-tab').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  renderTable();
-}
+            <!-- Hidden file input -->
+            <input id="imageInput" type="file" accept="image/*" class="hidden">
 
-document.getElementById('searchInput').addEventListener('input', e => {
-  currentSearch = e.target.value;
-  renderTable();
-});
+            <!-- Placeholder hint -->
+            <div id="uploadHint" class="flex flex-col items-center gap-2">
+              <svg width="28" height="28" viewBox="0 0 28 28" fill="none" style="opacity:.35">
+                <rect x="2" y="6" width="24" height="18" rx="3" stroke="currentColor" stroke-width="1.5"/>
+                <circle cx="10" cy="13" r="2.5" stroke="currentColor" stroke-width="1.2"/>
+                <path d="M2 20l6-5 4 4 4-3 10 7" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+                <path d="M18 2v8M15 5l3-3 3 3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              <div>
+                <p class="text-sm font-medium" style="color:var(--text2)">點擊或拖曳圖片上傳</p>
+                <p class="text-xs mt-0.5" style="color:var(--text3)">支援 JPG、PNG、WebP，最大 5MB</p>
+              </div>
+            </div>
 
-function openModal() {
-  const today = new Date().toISOString().split('T')[0];
-  document.getElementById('newStart').value = today;
-  document.getElementById('modal').classList.add('visible');
-}
+            <!-- Image preview -->
+            <img id="imgPreview" src="" alt="預覽" class="hidden w-full object-cover rounded-lg"
+                 style="max-height:130px">
 
-function closeModal() {
-  document.getElementById('modal').classList.remove('visible');
-}
+            <!-- Remove image button -->
+            <button id="removeImgBtn"
+                    class="hidden absolute top-2 right-2 flex items-center justify-center rounded-lg z-10"
+                    style="width:26px;height:26px;background:rgba(0,0,0,0.6);border:none;color:#fff;cursor:pointer"
+                    onclick="event.stopPropagation(); CampaignUI.clearImagePreview()">
+              <svg width="10" height="10" viewBox="0 0 12 12" fill="none">
+                <path d="M1 1l10 10M11 1L1 11" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+              </svg>
+            </button>
 
-function handleOverlayClick(e) {
-  if (e.target === document.getElementById('modal')) closeModal();
-}
+          </div>
+        </div>
 
-function createCampaign() {
-  const name = document.getElementById('newName').value.trim();
-  if (!name) { showToast('請輸入活動名稱', 'warning'); return; }
-  const type = document.getElementById('newType').value;
-  const start = document.getElementById('newStart').value || '—';
-  const end = document.getElementById('newEnd').value || '—';
-  const owner = document.getElementById('newOwner').value.trim() || '未知';
-  const newId = campaigns.reduce((max, c) => Math.max(max, c.id), 0) + 1;
-  campaigns.unshift({ id: newId, name, type, status: 'draft', start, end, owner, progress: 0 });
-  closeModal();
-  showToast(`草稿已建立：${name}`, 'success');
-  document.getElementById('newName').value = '';
-  document.getElementById('newOwner').value = '';
-  renderTable();
-}
+      </div><!-- /form -->
 
-let toastTimer = null;
+      <!-- Footer -->
+      <div class="flex justify-end gap-2.5 mt-6 pt-5" style="border-top:1px solid var(--border)">
+        <button onclick="CampaignUI.closeModal()"
+                class="text-sm font-medium rounded-lg px-4 py-2 cursor-pointer"
+                style="background:var(--bg3);border:1px solid var(--border);color:var(--text2)">
+          取消
+        </button>
+        <button id="submitBtn" onclick="CampaignUI.submitForm()"
+                class="text-sm font-medium rounded-lg px-4 py-2 cursor-pointer"
+                style="background:var(--accent);color:#0d0d0f;border:none;transition:background .15s"
+                onmouseenter="this.style.background='var(--accent2)'"
+                onmouseleave="this.style.background='var(--accent)'">
+          建立草稿
+        </button>
+      </div>
 
-function showToast(msg, type = 'success') {
-  const container = document.getElementById('toastContainer');
-  const toast = document.createElement('div');
-  toast.className = `toast toast-${type}`;
+    </div>
+  </div><!-- /campaignModal -->
 
-  const iconHtml = type === 'success'
-    ? `<div class="toast-icon"><svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>`
-    : `<div class="toast-icon"><svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M6 3v4M6 9v.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></div>`;
 
-  toast.innerHTML = `${iconHtml}<span>${msg}</span>`;
-  container.appendChild(toast);
-  requestAnimationFrame(() => { requestAnimationFrame(() => toast.classList.add('show')); });
-  setTimeout(() => {
-    toast.classList.remove('show');
-    setTimeout(() => toast.remove(), 300);
-  }, 3000);
-}
+  <!-- ============================================================
+       MODAL — Campaign Preview
+  ============================================================ -->
+  <div id="previewModal" class="modal-overlay">
+    <div class="modal-box rounded-2xl w-full max-w-sm mx-4 overflow-hidden"
+         style="background:var(--bg2);border:1px solid var(--border2)">
 
-renderTable();
-</script>
+      <!-- Preview image area -->
+      <div class="relative" style="height:200px;background:var(--bg4)">
+        <img id="previewImg" src="" alt="" class="hidden w-full h-full object-cover">
+        <div id="previewNoImg" class="flex flex-col items-center justify-center h-full gap-2">
+          <svg width="32" height="32" viewBox="0 0 32 32" fill="none" style="opacity:.2">
+            <rect x="2" y="6" width="28" height="20" rx="3" stroke="currentColor" stroke-width="1.5"/>
+            <circle cx="11" cy="14" r="3" stroke="currentColor" stroke-width="1.2"/>
+            <path d="M2 24l8-6 5 5 4-4 13 9" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+          </svg>
+          <span class="text-xs" style="color:var(--text3)">尚未上傳主視覺圖片</span>
+        </div>
+
+        <!-- Preview watermark -->
+        <div class="absolute top-3 left-3 text-xs font-medium px-2 py-1 rounded"
+             style="background:rgba(0,0,0,0.6);color:#fff;letter-spacing:.04em">
+          預覽模式
+        </div>
+
+        <!-- Close -->
+        <button onclick="CampaignUI.closeModal('previewModal')"
+                class="absolute top-3 right-3 flex items-center justify-center rounded-lg"
+                style="width:28px;height:28px;background:rgba(0,0,0,0.6);border:none;color:#fff;cursor:pointer">
+          <svg width="10" height="10" viewBox="0 0 12 12" fill="none">
+            <path d="M1 1l10 10M11 1L1 11" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Info -->
+      <div class="p-5">
+        <div class="flex items-start justify-between gap-3 mb-2">
+          <h3 id="previewName" class="font-display text-lg leading-tight" style="color:var(--text)">—</h3>
+          <div id="previewStatus"></div>
+        </div>
+        <p id="previewDesc" class="text-sm leading-relaxed" style="color:var(--text2)">—</p>
+      </div>
+
+    </div>
+  </div><!-- /previewModal -->
+
+
+  <!-- ============================================================
+       TOAST CONTAINER
+  ============================================================ -->
+  <div id="toastContainer"
+       class="fixed bottom-6 right-6 z-50 flex flex-col gap-2"></div>
+
+
+  <!-- ============================================================
+       SCRIPTS
+  ============================================================ -->
+  <script src="_js/data.js"></script>
+  <script src="_js/ui.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      CampaignUI.init();
+
+      // Sidebar toggle icon rotation
+      const sb = document.getElementById('sidebar');
+      const icon = document.getElementById('toggleIcon');
+      const obs = new MutationObserver(() => {
+        icon.style.transform = sb.classList.contains('collapsed') ? 'rotate(180deg)' : '';
+      });
+      obs.observe(sb, { attributes: true, attributeFilter: ['class'] });
+    });
+  </script>
+
 </body>
 </html>
